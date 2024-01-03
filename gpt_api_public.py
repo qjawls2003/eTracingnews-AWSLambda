@@ -59,10 +59,7 @@ def lambda_handler(event, context):
     print("Uploading to RDS")
     res = invokeUploadRDS(output)
     
-    return {
-        'statusCode': 200,
-        'body': json.dumps('Uploaded to RDS!')
-    }
+    return res
 
 
 def invokeUploadRDS(input):

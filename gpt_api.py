@@ -35,8 +35,70 @@ def lambda_handler(event, context):
         'source':source_url
     }
     '''
-    res = uploadToRDS(event)
-    return res
+    client = OpenAI(
+        api_key=get_secret(),
+        )
+    response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[
+        {"role": "system", "content": "You are a cybersecurity journalist."},
+        {"role": "user", "content": "Paraphrase this article title: " + event['title']}
+    ]
+    )
+    title = response.choices[0].message.content
+    
+    response2 = client.chat.completions.create(
+    model="gpt-4",
+    messages=[
+        {"role": "system", "content": "You are a cybersecurity journalist."},
+        {"role": "user", "content": "Summarize this article: " + event['article']}
+    ]
+    )
+    article = response2.choices[0].message.content
+    
+    
+    output = {
+        'title':title,
+        'date':event['date'],
+        'imageURL':event['imageURL'],
+        'article':article,
+        'source':event['source']
+        }
+        
+    res = uploadToRDS(output)
+    
+    return {
+        'statusCode': res['statusCode'],
+        'body': json.dumps('Uploaded to RDS!')
+    }
+
+
+
+def get_secret():
+
+    secret_name = "openai_api_key"
+    region_name = "us-east-2"
+
+    # Create a Secrets Manager client
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
+
+    try:
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+    except ClientError as e:
+        # For a list of exceptions thrown, see
+        # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
+        raise e
+
+    # Decrypts secret using the associated KMS key.
+    secret = get_secret_value_response['SecretString']
+    key = json.loads(secret)
+    return key['openai_gpt_api_key']
     
     
 def uploadToRDS(input):

@@ -14,16 +14,19 @@ def lambda_handler(event, context):
         
     hackernews() 
     darkreading()
+    resList = []
     for url,site in urls: #invoke downloader async
         input = {
             'url':url,
             'site':site
         }
         res = invokeDownloader(input)
+        resList.append(res)
         responseList.append(res['Payload'])
     print(urls)
     #print("number of response: ", len(responseList))
     print("number of urls: ", len(urls))
+    print(len(resList))
     return {
         'statusCode': 200,
         'body': json.dumps('Sent tasks to ')
@@ -32,8 +35,8 @@ def lambda_handler(event, context):
 
 def invokeDownloader(input):
     response = client_ld.invoke(
-    FunctionName = 'arn:aws:lambda:us-east-2:689050894738:function:blog_download',
-    InvocationType = 'Event',
+    FunctionName = 'arn:aws:lambda:us-east-1:689050894738:function:blog_download',
+    InvocationType = 'RequestResponse',
     Payload = json.dumps(input)
     )
     return response

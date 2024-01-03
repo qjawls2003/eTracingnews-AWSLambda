@@ -42,11 +42,11 @@ def lambda_handler(event, context):
     }
 
 def getFromRDS():
-    #today = date.today()
-    #formatted_today = today.strftime("%Y-%-m-%-d")
-    today = "2023-12-22"
+    today = date.today()
+    formatted_today = today.strftime("%Y-%-m-%-d")
+    #today = "2023-12-22"
     print(today)
-    formatted_today = "2023-12-22"
+    #formatted_today = "2023-12-22"
     print(today)
     try:
         connection = mysql.connector.connect(**connection_config)
