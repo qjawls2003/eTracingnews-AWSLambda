@@ -56,10 +56,12 @@ def lambda_handler(event, context):
         'source':event['source']
         }
     
-    print("Uploading to RDS")
+    
+  
     res = invokeUploadRDS(output)
     
-    return res
+    res1 = invokeUploadOS(output)
+    return 'SUC'
 
 
 def invokeUploadRDS(input):
@@ -68,9 +70,17 @@ def invokeUploadRDS(input):
     InvocationType = 'RequestResponse',
     Payload = json.dumps(input)
     )
+    print("Uploaded to RDS")
     return response
-    #print(json.load(response['Payload']))
-
+    
+def invokeUploadOS(input):
+    response = client_ld.invoke(
+    FunctionName = 'arn:aws:lambda:us-east-1:689050894738:function:embedding_dataset',
+    InvocationType = 'RequestResponse',
+    Payload = json.dumps(input)
+    )
+    print("Uploaded to OS")
+    return response
 
 def get_secret():
 
